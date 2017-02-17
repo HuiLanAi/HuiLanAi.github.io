@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html class=""><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><script src="index_data/console_runner-079c09a0e3b9ff743e39ee2d5637b9216b3545af0de366.js"></script><style type="text/css">
+:root .ad,
+:root #header + #content > #left > #rlblock_left
+{ display: none !important; }</style><script src="index_data/events_runner-73716630c22bbc8cff4bd0f07b135f00a0bdc5d14629260.js"></script><script src="index_data/css_live_reload_init-2c0dc5167d60a5af3ee189d570b1835129687ea2.js"></script><meta charset="UTF-8"><meta name="robots" content="noindex"><link rel="shortcut icon" type="image/x-icon" href="http://production-assets.codepen.io/assets/favicon/favicon-8ea04875e70c4b0bb41da869e81236e54394d63638a1ef12fa558a4a835f1164.ico"><link rel="mask-icon" type="" href="http://production-assets.codepen.io/assets/favicon/logo-pin-f2d2b6d2c61838f7e76325261b7195c27224080bc099486ddd6dccb469b8e8e6.svg" color="#111"><link rel="canonical" href="http://codepen.io/NightSiesta/pen/RKEWpE">
+
+
+<style class="cp-pen-styles">#time{
+  width:20%;
+  margin-left:170px;
+  font-size:40px;
+  color:green;
+}</style></head><body>
+
+  
+  
+    <div id="container">
+    <canvas width="500px" height="500px" id="canvas">您的浏览器不支持canvas<canvas>
+      </canvas></canvas></div>
+      <!--先画时针，因为秒针在上会覆盖时针-->
+      <div><p id="time">21:59:25</p></div>
+    
+  
+<script src="index_data/stopExecutionOnTimeout-b2a7b3fe212eaa732349046d8416e00a9dec26.js"></script>
+<script>var canvas=document.getElementById("canvas");
+var cxt=canvas.getContext("2d");
+//将整个画表盘的过程封装在一个函数之内
+function drawClock(){
+  cxt.clearRect(0,0,500,500);
+  //需要清除画布，如果不，每一次的新时钟都会相互重叠//
+//通过js获取当前时间使用js的Date对象；
+var now=new Date();
+var hour=now.getHours();//注意我们的时钟是12小时，但是获取到的是24小时，所以需要处理一下
+  var dayOrNight=new Image();
+if(hour<12){
+  dayOrNight.src="http://img4.imgtn.bdimg.com/it/u=1508230784,1665872702&fm=21&gp=0.jpg";}
+  else{
+    hour=hour-12;    dayOrNight.src="http://img1.imgtn.bdimg.com/it/u=3972025439,2567179458&fm=23&gp=0.jpg";
+  }
+cxt.drawImage(dayOrNight,0,30,100,100);//画图表示白天还是晚上
+var minute=now.getMinutes();
+var second=now.getSeconds();
+//注意，这里通过js获取到的时间是不断改变的变量，而不是一个常量，这也是我们可以看到不断变化时间的关键//
+//画表盘
+cxt.beginPath();
+cxt.lineWidth="10";
+cxt.strokeStyle="blue";
+cxt.arc(250,250,200,0,360,false);
+cxt.stroke();
+cxt.closePath();
+//用for循环进行旋转来画出时刻度
+for(i=0;i<12;i++){
+    cxt.lineWidth="7";
+    cxt.strokeStyle="black";
+    cxt.save();
+  cxt.translate(250,250);//设置0,0点
+  cxt.rotate(i*30*Math.PI/180);//一30°进行旋转
+  cxt.beginPath();
+  cxt.moveTo(0,170);//设置位置时上为负数,下为正数
+  cxt.lineTo(0,190);
+  cxt.stroke();
+  cxt.closePath();
+    cxt.restore();
+  }
+//用for循环进行旋转画出分刻度
+for(i=0;i<60;i++){
+  cxt.save();
+  cxt.beginPath();
+  cxt.translate(250,250);
+  cxt.lineWidth="3";
+  cxt.rotate(i*6*Math.PI/180);
+  cxt.moveTo(0,180);
+  cxt.lineTo(0,190);
+  cxt.stroke();
+  cxt.closePath();
+  cxt.restore();}
+  //因为时针分针秒针都需要旋转所以采用save
+  //画一个时针
+  cxt.save();
+  cxt.lineWidth="7";
+  cxt.beginPath();
+  cxt.translate(250,250);
+  cxt.rotate(hour*30*Math.PI/180+minute/2*Math.PI/180+second/120*Math.PI/180);
+  cxt.moveTo(0,-130);
+  cxt.lineTo(0,10);
+  cxt.stroke();
+  cxt.closePath();
+  cxt.restore();
+  //画一个分针
+  cxt.save();
+  cxt.translate(250,250);
+  cxt.rotate(minute*6*Math.PI/180+second/10*Math.PI/180);
+  cxt.lineWidth="3";
+  cxt.strokeStyle="black";
+  cxt.beginPath();
+  cxt.moveTo(0,20);
+  cxt.lineTo(0,-150);
+  cxt.stroke();
+  cxt.closePath();
+  cxt.restore();
+  //画一个秒针
+  cxt.save();
+  cxt.lineWidth="1";
+  cxt.strokeStyle="red";
+  cxt.translate(250,250);
+  cxt.rotate(second*6*Math.PI/180);
+  cxt.beginPath();
+  cxt.moveTo(0,30);
+  cxt.lineTo(0,-160);
+  cxt.stroke();
+  cxt.closePath();
+  cxt.restore();
+  //画出三个针的交叉点
+  cxt.beginPath();
+  cxt.arc(250,250,10,0,360,false);
+  cxt.stroke();
+  cxt.fillStyle="gold";
+  cxt.fill();
+  cxt.closePath();
+}
+  setInterval(drawClock,1000);
+function showTime(){
+  var nowTime=new Date();
+  var hour=nowTime.getHours();
+  var minute=nowTime.getMinutes();
+  var second=nowTime.getSeconds();
+  if(second>=10){
+  document.getElementById("time").innerHTML=hour+":"+minute+":"+second;}
+  else{
+  document.getElementById("time").innerHTML=hour+":"+minute+":0"+second;
+  }}
+  setInterval(showTime,1000);
+//# sourceURL=pen.js
+</script>
+</body></html>
